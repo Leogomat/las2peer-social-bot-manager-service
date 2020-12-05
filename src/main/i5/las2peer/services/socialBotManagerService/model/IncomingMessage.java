@@ -9,7 +9,7 @@ import i5.las2peer.services.socialBotManagerService.model.ChatResponse;
 public class IncomingMessage {
 	String intentKeyword;
 	String entityKeyword;
-    String NluID;
+	String NluID;
 
 	ArrayList<ChatResponse> responses;
 
@@ -18,28 +18,40 @@ public class IncomingMessage {
 
 	String triggeredFunctionId;
 
-	private static String[][] UMLAUT_REPLACEMENTS = { { new String("Ä"), "Ae" }, { new String("Ü"), "Ue" },
-			{ new String("Ö"), "Oe" }, { new String("ä"), "ae" }, { new String("ü"), "ue" }, { new String("ö"), "oe" },
-			{ new String("ß"), "ss" } };
+	private static HashMap<String, String> UMLAUTE = new HashMap<String, String>();
+	static {
+		UMLAUTE.put("Ä", "Ae");
+		UMLAUTE.put("Ö", "Oe");
+		UMLAUTE.put("Ü", "Ue");
+		UMLAUTE.put("ä", "ae");
+		UMLAUTE.put("ü", "ue");
+		UMLAUTE.put("ö", "oe");
+		UMLAUTE.put("ß", "ss");
+	}
 
 	public static String replaceUmlaute(String orig) {
+		if (orig == null) {
+			return "";
+		}
 		String result = orig;
+		for (HashMap.Entry<String, String> entry : UMLAUTE.entrySet()) {
+			String key = entry.getKey();
+			String value = entry.getValue();
 
-		for (int i = 0; i < UMLAUT_REPLACEMENTS.length; i++) {
-			result = result.replace(UMLAUT_REPLACEMENTS[i][0], UMLAUT_REPLACEMENTS[i][1]);
+			result = result.replace(key, value);
 		}
 
 		return result;
 	}
 
-
 	public IncomingMessage(String intent, String NluID) {
 		this.intentKeyword = replaceUmlaute(intent);
 		this.followupMessages = new HashMap<String, IncomingMessage>();
 		this.responses = new ArrayList<ChatResponse>();
-        if(NluID == ""){
-            this.NluID = "";
-        } else this.NluID = NluID;
+		if (NluID == "") {
+			this.NluID = "";
+		} else
+			this.NluID = NluID;
 	}
 
 	public String getIntentKeyword() {
@@ -53,11 +65,11 @@ public class IncomingMessage {
 	public void setEntityKeyword(String entityKeyword) {
 		this.entityKeyword = entityKeyword;
 	}
-    
+
 	public String getNluID() {
 		return NluID;
 	}
- 
+
 	public HashMap<String, IncomingMessage> getFollowingMessages() {
 		return followupMessages;
 	}
@@ -77,7 +89,7 @@ public class IncomingMessage {
 			return responses.get(random.nextInt(responses.size()));
 		}
 	}
-	
+
 	public ArrayList<ChatResponse> getResponseArray() {
 		if (responses.isEmpty()) {
 			return null;
@@ -93,6 +105,5 @@ public class IncomingMessage {
 	public String getTriggeredFunctionId() {
 		return this.triggeredFunctionId;
 	}
-
 
 }

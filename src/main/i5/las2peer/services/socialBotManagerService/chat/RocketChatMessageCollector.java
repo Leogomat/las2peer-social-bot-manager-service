@@ -2,19 +2,34 @@ package i5.las2peer.services.socialBotManagerService.chat;
 
 import org.json.JSONArray;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.rocketchat.core.model.RocketChatMessage;
 import com.rocketchat.core.model.RocketChatMessage.Type;
 
 public class RocketChatMessageCollector extends ChatMessageCollector {
-	private static String[][] UMLAUT_REPLACEMENTS = { { new String("Ä"), "Ae" }, { new String("Ü"), "Ue" },
-			{ new String("Ö"), "Oe" }, { new String("ä"), "ae" }, { new String("ü"), "ue" },
-			{ new String("ö"), "oe" }, { new String("ß"), "ss" } };
+	private static HashMap<String, String> UMLAUTE = new HashMap<String, String>();
+	static {
+		UMLAUTE.put("Ä", "Ae");
+		UMLAUTE.put("Ö", "Oe");
+		UMLAUTE.put("Ü", "Ue");
+		UMLAUTE.put("ä", "ae");
+		UMLAUTE.put("ü", "ue");
+		UMLAUTE.put("ö", "oe");
+		UMLAUTE.put("ß", "ss");
+	}
 
 	public static String replaceUmlaute(String orig) {
+		if (orig == null) {
+			return "";
+		}
 		String result = orig;
+		for (HashMap.Entry<String, String> entry : UMLAUTE.entrySet()) {
+			String key = entry.getKey();
+			String value = entry.getValue();
 
-		for (int i = 0; i < UMLAUT_REPLACEMENTS.length; i++) {
-			result = result.replace(UMLAUT_REPLACEMENTS[i][0], UMLAUT_REPLACEMENTS[i][1]);
+			result = result.replace(key, value);
 		}
 
 		return result;
@@ -57,7 +72,7 @@ public class RocketChatMessageCollector extends ChatMessageCollector {
 					String user = message.getSender().getUserName();
 					String msg = replaceUmlaute(message.getMessage());
 					ChatMessage cm = new ChatMessage(rid, user, msg);
-					System.out.println("Email of user is "+ email );
+					System.out.println("Email of user is " + email);
 					cm.setEmail(email);
 					cm.setRole(role);
 					this.addMessage(cm);
